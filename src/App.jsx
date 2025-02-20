@@ -22,13 +22,18 @@ function App() {
       return post.id !== id
     });
     setPostsList(updatedList);
+    if (updatedList.length === 0) {
+      return <h1>Non ci sono posts</h1>
+    }
   }
 
 
   return (
     <>
 
-      {
+      {postsList.length === 0 ? (
+        <h1>Non ci sono posts</h1>
+      ) : (
         postsList.map((post) => (
           <div className='postItem' key={post.id}>
             <h2>{post.title}</h2>
@@ -39,8 +44,7 @@ function App() {
             <button onClick={() => removePost(post.id)}>Cancella Post</button>
           </div >
         ))
-
-      }
+      )}
     </>
   )
 }
