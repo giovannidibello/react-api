@@ -24,21 +24,12 @@ function App() {
   // chiamata funzione solo al primo rendering
   useEffect(fetchTodos, []);
 
-  // funzione rimozione post
-  const removePost = (id) => {
-    const updatedList = postsList.filter((post) => {
-      return post.id !== id
-    });
-    setPostsList(updatedList);
-    if (updatedList.length === 0) {
-      return <h1>Non ci sono posts</h1>
-    }
-  }
 
   // funzione di gestione delle info dei campi
   function handleFormData(e) {
 
-    const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    const value = e.target.name === "tags" ? e.target.value.split(",") : e.target.value;
+
     // setto tramite lo stato l'oggetto con le info prese dai campi del form
     setFormData((currentFormData) => ({
       ...currentFormData,
@@ -46,11 +37,43 @@ function App() {
     }));
   }
 
-  // funzione di gestione dell'invio del form
+  // funzione di gestione dell'invio del form (creazione post)
   function handleSubmit(e) {
     e.preventDefault();
-    setPostsList((currentPost) => [...currentPost, { id: currentPost.length === 0 ? 1 : currentPost[currentPost.length - 1].id + 1, ...formData }]);
+
+    // invio dati BE
+    axios.post("http://localhost:3000/posts/", formData)
+      .then((res) =>
+
+        // setPostList(res.data)
+        setPostsList((currentPost) => [...currentPost, res.data])
+
+      )
+      .catch(err => {
+        console.log(err)
+      })
+
     setFormData(initialFormData);
+  }
+
+  // funzione rimozione post
+  const removePost = (id) => {
+    const updatedList = postsList.filter((post) => {
+      return post.id !== id
+    });
+
+    // chiamata ad API sulla rotta di delete
+
+    axios.delete(`http://localhost:3000/posts/${id}`)
+
+      .then(res =>
+        console.log(res),
+
+        // lo sostituiamo anche nel FE
+        setPostsList(updatedList)
+      )
+      .catch(err => console.log(err))
+
   }
 
 
